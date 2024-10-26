@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generative Art with Nature Sounds</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 20px auto;
+            background-color: #f0f8ff; /* Light background color */
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="artCanvas" width="600" height="400"></canvas>
+
+<!-- Audio Elements for Nature Sounds -->
+<audio id="birdSounds" src="sound/bird-sounds.wav" preload="auto"></audio>
+<audio id="birdsSinging" src="sound/birds-singing.wav" preload="auto"></audio>
+<audio id="naturesBeauty" src="sound/natures-beauty.mp3" preload="auto"></audio>
+<audio id="summerRainShower" src="sound/summer-rain-shower.wav" preload="auto"></audio>
+
+<!-- Controls for the art generation -->
+<input type="number" id="shapeCount" placeholder="Number of shapes" value="20">
+<select id="shapeType">
+    <option value="rect">Rectangle</option>
+    <option value="circle">Circle</option>
+    <option value="triangle">Triangle</option>
+    <option value="ellipse">Ellipse</option>
+</select>
+<input type="color" id="baseColor" value="#00ff00">
+<input type="range" id="shapeSize" min="10" max="100" value="50">
+<button id="generateArtBtn">Generate Art</button>
+
+<script>
+const canvas = document.getElementById('artCanvas');
+const ctx = canvas.getContext('2d');
+
+// Load nature sounds
+const birdSounds = document.getElementById('birdSounds');
+const birdsSinging = document.getElementById('birdsSinging');
+
+// Function to generate random colors
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+// Function to draw a triangle
+function drawTriangle(x, y, size) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + size, y + size);
+    ctx.lineTo(x - size, y + size);
+    ctx.closePath();
+    ctx.fill();
+}
+
+// Function to play the sound based on the shape
+function playShapeSound(shapeType) {
+    if (shapeType === 'circle') {
+        birdsSinging.currentTime = 0; // Reset sound
+        birdsSinging.play().catch(error => console.error('Error playing sound:', error));
+    } else if (shapeType === 'rect') {
+        birdSounds.currentTime = 0; // Reset sound
+        birdSounds.play().catch(error => console.error('Error playing sound:', error));
+    }
+}
+
+// Function to generate the art based on inputs
+function generateArt() {
+    const shapeCount = document.getElementById('shapeCount').value;
+    const shapeType = document.getElementById('shapeType').value;
+    const shapeSize = document.getElementById('shapeSize').value;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < shapeCount; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const size = Math.random() * shapeSize;
+
+        ctx.fillStyle = getRandomColor();
+        
+        if (shapeType === 'rect') {
+            ctx.fillRect(x, y, size, size);
+            playShapeSound('rect');
+        } else if (shapeType === 'circle') {
+            ctx.beginPath();
+            ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            playShapeSound('circle');
+        } else if (shapeType === 'triangle') {
+            drawTriangle(x, y, size / 2);
+            playShapeSound('rect'); // Use rectangle sound for triangles
+        } else if (shapeType === 'ellipse') {
+            ctx.beginPath();
+            ctx.ellipse(x, y, size / 2, size / 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+            playShapeSound('circle'); // Use circle sound for ellipses
+        }
+    }
+}
+
+// Add event listener to the "Generate Art" button
+document.getElementById('generateArtBtn').addEventListener('click', generateArt);
+
+// Automatically generate art when the page loads
+window.onload = function() {
+    generateArt();
+}
+</script>
+
+</body>
+</html>
